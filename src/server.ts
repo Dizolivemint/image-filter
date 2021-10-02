@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -35,6 +35,31 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   // Displays a simple message to the user
   app.get( "/", async ( req, res ) => {
     res.send("try GET /filteredimage?image_url={{}}")
+  } );
+
+  // Filtered Image Endpoint
+  app.get( "/filteredimage", async ( req: Request, res: Response ) => {
+    const { image_url } = req.query
+    const files: Array<string> = []
+
+    // 1. Validate the image query
+    if (!image_url) res.status(400).send("try /filteredimage?image_url=https://picsum.photos/200")
+
+    // 2. Call filterImageFromURL(image_url) to filter the image
+    filterImageFromURL(`${image_url}`)
+      .then(file => {
+        // 3. Send the resulting file in the response
+        res.sendFile(file, err => {
+          if (err) res.status(422).send('An error occured while sending the file')
+          else try {
+            files.push(file)
+            deleteLocalFiles(files) // 4. Deletes any files on the server on finish of the response
+          } catch (err) {
+            console.log('Error removing file')
+          }
+        })
+      }) 
+      .catch(e => res.status(422).send('An error occured while attempting to process the file. Not all images will work. Try /filteredimage?image_url=https://picsum.photos/200'))
   } );
   
 
