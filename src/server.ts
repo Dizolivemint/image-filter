@@ -12,6 +12,12 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
+  
+  // Root Endpoint
+  // Displays a simple message to the user
+  app.get( "/", async ( req, res ) => {
+    res.send("try GET /filteredimage?image_url={{}}")
+  } );
 
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
@@ -29,15 +35,6 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
-  //! END @TODO1
-  
-  // Root Endpoint
-  // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
-
-  // Filtered Image Endpoint
   app.get( "/filteredimage", async ( req: Request, res: Response ) => {
     const { image_url } = req.query
     const files: Array<string> = []
@@ -62,7 +59,8 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
       .catch(e => res.status(422).send('An error occured while attempting to process the file. Not all images will work. Try /filteredimage?image_url=https://picsum.photos/200'))
   } );
   
-
+  //! END @TODO1
+  
   // Start the Server
   app.listen( port, () => {
       console.log( `server running http://localhost:${ port }` );
